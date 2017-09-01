@@ -27,10 +27,14 @@
 		"test": "xo && mocha"
 	},
 	"devDependencies": {
+		"jshint": "^2.9.5",
 		"mocha": "^3.4.0",
 		"xo": "^0.18.0"
 	},
 	"xo": {
 		"space": true
+	},
+	"dependencies": {
+		"taketalk": "^1.0.0"
 	}
 }

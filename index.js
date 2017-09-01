@@ -9,17 +9,17 @@ function stringToHex(hex) {
   const isHex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex);
   hex = isHex ? hex : '#000000';
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, (m, r, g, b) => `${r}${r}${g}${g}${b}${b}`);
   return hex;
 }
 
 function hexToRGB(hex) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   hex = hex.replace(shorthandRegex, (m, r, g, b) => `${r}${r}${g}${g}${b}${b}`);
 
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 
   return result ? {
     R: parseInt(result[1], 16),
@@ -28,7 +28,7 @@ function hexToRGB(hex) {
   } : {};
 }
 
-/* 
+/*
   http://www.easyrgb.com/en/math.php
   (Standard RGB) input range = 0 ÷ 255
   X, Y and Z output refer to a D65/2° standard illuminant.
@@ -39,9 +39,9 @@ function rgbToXYZ(RGB) {
   const GREEN = ((RGB.G / 255) > 0.04045) ? Math.pow((((RGB.G / 255) + 0.055) / 1.055), 2.4) * 100 : ((RGB.G / 255) / 12.92) * 100;
   const BLUE = ((RGB.B / 255) > 0.04045) ? Math.pow((((RGB.B / 255) + 0.055) / 1.055), 2.4) * 100 : ((RGB.B / 255) / 12.92) * 100;
 
-  const Xv = RED * 0.4124 + GREEN * 0.3576 + BLUE * 0.1805;
-  const Yv = RED * 0.2126 + GREEN * 0.7152 + BLUE * 0.0722;
-  const Zv = RED * 0.0193 + GREEN * 0.1192 + BLUE * 0.9505;
+  const Xv = (RED * 0.4124) + (GREEN * 0.3576) + (BLUE * 0.1805);
+  const Yv = (RED * 0.2126) + (GREEN * 0.7152) + (BLUE * 0.0722);
+  const Zv = (RED * 0.0193) + (GREEN * 0.1192) + (BLUE * 0.9505);
 
   return {
     X: Xv,
@@ -50,15 +50,15 @@ function rgbToXYZ(RGB) {
   };
 }
 
-/* 
+/*
   http://www.easyrgb.com/en/math.php
   XYZ (Tristimulus) Reference values of a perfect reflecting diffuser
   D65 is illuminants and observer has been choosen
   2° (CIE 1964) REFERENCE_X, REFERENCE_Y and REFERENCE_Z.
   Daylight, sRGB, Adobe-RGB
 */
-function xyzToCIELab(XYZ) {
 
+function xyzToCIELab(XYZ) {
   const REFERENCE_X = 95.047;
   const REFERENCE_Y = 100.000;
   const REFERENCE_Z = 108.883;
@@ -84,15 +84,14 @@ function rgbToCIELab(RGB) {
 }
 
 /*
-  http://www.easyrgb.com/en/math.php 
+  http://www.easyrgb.com/en/math.php
   https://en.wikipedia.org/wiki/Color_difference
 
   Delta E* CIE return value table
   http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e
 */
 
-function DeltaE1994(CIELab1, CIELab2) {
-
+function deltaE1994(CIELab1, CIELab2) {
   const DeltaE94 = Math.sqrt(Math.pow((CIELab1.L - CIELab2.L), 2) + Math.pow((CIELab1.a - CIELab2.a), 2) + Math.pow((CIELab1.b - CIELab2.b), 2));
   return DeltaE94;
 }
@@ -104,7 +103,6 @@ function DeltaE1994(CIELab1, CIELab2) {
   2 - 10	  Perceptible at a glance.
   11 - 49	  Colors are more similar than opposite
   100	      Colors are exact opposite
-  
   status
   0   Exact Match
   2	  Not perceptible by human eyes.
@@ -114,14 +112,13 @@ function DeltaE1994(CIELab1, CIELab2) {
 */
 
 function matchColor(CIELab1, ColorCollection) {
-  let delta = DeltaE1994(CIELab1, ColorCollection.cieLab);
-
+  const delta = deltaE1994(CIELab1, ColorCollection.cieLab);
   if (delta === 0) {
     return {
       status: 1,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
-      delta: delta,
+      delta,
       message: 'Exact Match'
     };
   } else if (delta > 0 && delta <= 1) {
@@ -129,7 +126,7 @@ function matchColor(CIELab1, ColorCollection) {
       status: 2,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
-      delta: delta,
+      delta,
       message: 'Not perceptible by human eyes'
     };
   } else if (delta > 1 && delta < 2) {
@@ -137,7 +134,7 @@ function matchColor(CIELab1, ColorCollection) {
       status: 4,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
-      delta: delta,
+      delta,
       message: 'Perceptible through close observation'
     };
   } else if (delta >= 2 && delta < 10) {
@@ -145,7 +142,7 @@ function matchColor(CIELab1, ColorCollection) {
       status: 8,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
-      delta: delta,
+      delta,
       message: 'Perceptible at a glance'
     };
   } else if (delta === 100) {
@@ -153,34 +150,29 @@ function matchColor(CIELab1, ColorCollection) {
       status: 18,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
-      delta: delta,
+      delta,
       message: 'Colors are exact opposite'
     };
-  } else {
-    return {
-      status: -1,
-      message: 'Couldn\'t find any similar or matching colors'
-    };
   }
-
+  return {
+    status: -1,
+    delta,
+    message: 'No Color match found'
+  };
 }
 
-module.exports = function (hexcolor, options) {
+module.exports = function (hexcolor) {
   hexcolor = stringToHex(hexcolor);
-  let rgbColor = hexToRGB(hexcolor);
-  let cieLabColor = rgbToCIELab(rgbColor);
-  let matchedColor = [];
-  options = options || {};
-  colors.collection.forEach(function (element, index) {
+  const rgbColor = hexToRGB(hexcolor);
+  const cieLabColor = rgbToCIELab(rgbColor);
+  const matchedColor = [];
+
+  colors.collection.forEach(element => {
     if (matchColor(cieLabColor, element).status > 0) {
       matchedColor.push(matchColor(cieLabColor, element));
     }
-  }, this);
+  });
 
-  const lowestdelta = matchedColor.reduce(function (prev, current) {
-    return (prev.delta < current.delta) ? prev : current;
-  }); //returns object
-
-  console.log(lowestdelta);
-
+  const matched = matchedColor.reduce((prevColor, currentColor) => (prevColor.delta < currentColor.delta) ? prevColor : currentColor);
+  return matched;
 };
