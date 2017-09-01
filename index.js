@@ -71,38 +71,9 @@ function xyzToCIELab (x, y, z) {
   return [ CIEL, CIEA , CIEB ];
 }
 
-// https://en.wikipedia.org/wiki/HSL_and_HSV  
-function rgbToHSL(red, green, blue) {
-  red = red / 255;
-  green = green / 255;
-  blue = blue / 255;
-  let hue, hue1, saturation;
-  const MAX = Math.max(red, Math.max(green, blue));
-  const MIN = Math.min(red, Math.min(green, blue));
-  const LIGHTNESS = (MAX + MIN) / 2;
-
-  if (MAX === MIN) {
-    hue = saturation = 0; // achromatic
-  } else {
-    const CHROMA = MAX - MIN;
-    //saturation = LIGHTNESS > 0.5 ? CHROMA / (2 - MAX - MIN) : CHROMA / (MAX + MIN);
-    saturation = CHROMA / (1 - Math.abs(2 * LIGHTNESS - 1));
-    switch (MAX) {
-      case red:
-        hue1 = ((green - blue) / CHROMA) % 6;
-        break;
-      case green:
-        hue1 = ((blue - red) / CHROMA) + 2;
-        break;
-      case blue:
-        hue1 = ((red - green) / CHROMA) + 4;
-        break;
-    }
-    // Hue in Degree
-    hue = hue1 * 60;
-  }
-  // Returns an array of HSL => H (Degree), S%, L%
-  return [Math.round(hue), Math.round(saturation * 100), Math.round(LIGHTNESS * 100)];
+function rgbToCIELab (red, green, blue) {
+  const XYZ =  rgbToXYZ(red,green,blue);
+  return xyzToCIELab(XYZ[0], XYZ[1], XYZ[2]);
 }
 
 /*
@@ -126,13 +97,13 @@ function DeltaE1994(CIELab1  , CIELab2) {
   const WHTC = 0.045;
   const WHTH = 0.015;
   
-  const xC1 = Math.sqrt(( CIELab1[1] ^ 2 ) + ( CIELab1[2] ^ 2 ));
-  const xC2 = Math.sqrt(( CIELab2[1] ^ 2 ) + ( CIELab2[2] ^ 2 ));
+  const xC1 = Math.sqrt(Math.pow( CIELab1[1] , 2 ) + Math.pow( CIELab1[2] , 2 ));
+  const xC2 = Math.sqrt(Math.pow( CIELab2[1] , 2 ) + Math.pow( CIELab2[2] , 2 ));
   let xDL = CIELab2[0] - CIELab1[0];
-  let xDC = xC2 - xC1
+  let xDC = xC2 - xC1;
   const xDE = Math.sqrt( ( ( CIELab1[0] - CIELab2[0] ) * ( CIELab1[0] - CIELab2[0] ) ) + ( ( CIELab1[1] - CIELab2[1] ) * ( CIELab1[1] - CIELab2[1]) ) + ( ( CIELab1[2] - CIELab2[2] ) * ( CIELab1[2] - CIELab2[2] ) ) );
   
-  let xDH = ( xDE * xDE ) - ( xDL * xDL ) - ( xDC * xDC )
+  let xDH = ( xDE * xDE ) - ( xDL * xDL ) - ( xDC * xDC );
   xDH = ( xDH > 0 ) ? Math.sqrt( xDH ) : 0;
 
   const xSC = 1 + ( 0.045 * xC1 );
@@ -141,18 +112,22 @@ function DeltaE1994(CIELab1  , CIELab2) {
   xDC = xDC / (WHTC * xSC);
   xDH = xDH / (WHTH * xSH);
   
-  const DeltaE94 = Math.sqrt( xDL ^ 2 + xDC ^ 2 + xDH ^ 2 );
+  const DeltaE94 = Math.sqrt( Math.pow(xDL , 2) + Math.pow(xDC , 2) + Math.pow(xDH , 2) );
   return DeltaE94;
 }
 
 module.exports = function (hexcolor, options) {
   hexcolor = stringToHex(hexcolor);
   let rgbColor = hexToRGB(hexcolor);
-  let hslColor = rgbToHSL(rgbColor[0], rgbColor[1], rgbColor[2]);
+  console.log(`RGB: ${rgbColor}`);
+  let cieLabColor = rgbToCIELab(rgbColor[0], rgbColor[1], rgbColor[2]);
   options = options || {};
+  colors.collection.forEach(function(element) {
+  let delta = DeltaE1994(cieLabColor , [element.CIELab.L,element.CIELab.a, element.CIELab.b]);
+  console.log(delta);
+  if(delta <= 1) {
+    console.log(`DELTA is: (${delta}) - ${hexcolor} and ${element.Name} with hexcode of ${element.RGB.Red},${element.RGB.Green}, ${element.RGB.Blue} Perceptible through close observation`);
+  }
+}, this);
 
-  return {
-    rgb: rgbColor,
-    hsl: hslColor
-  };
 };
