@@ -1,4 +1,4 @@
-const colors = require('./colors');
+const colors = require('colorlist');
 
 function stringToHex(hex) {
   // Convert to string and make sure input color is in Uppercase
