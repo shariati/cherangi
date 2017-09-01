@@ -1,4 +1,3 @@
-'use strict';
 const colors = require('./colors');
 
 function stringToHex(hex) {
@@ -106,7 +105,7 @@ function DeltaE1994(CIELab1, CIELab2) {
   11 - 49	  Colors are more similar than opposite
   100	      Colors are exact opposite
   
-  matchstatus
+  status
   0   Exact Match
   2	  Not perceptible by human eyes.
   4	  Perceptible through close observation.
@@ -119,49 +118,49 @@ function matchColor(CIELab1, ColorCollection) {
 
   if (delta === 0) {
     return {
-      matchstatus: 1,
+      status: 1,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
       delta: delta,
       message: 'Exact Match'
-    }
+    };
   } else if (delta > 0 && delta <= 1) {
     return {
-      matchstatus: 2,
+      status: 2,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
       delta: delta,
       message: 'Not perceptible by human eyes'
-    }
+    };
   } else if (delta > 1 && delta < 2) {
     return {
-      matchstatus: 4,
+      status: 4,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
       delta: delta,
       message: 'Perceptible through close observation'
-    }
+    };
   } else if (delta >= 2 && delta < 10) {
     return {
-      matchstatus: 8,
+      status: 8,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
       delta: delta,
       message: 'Perceptible at a glance'
-    }
+    };
   } else if (delta === 100) {
     return {
-      matchstatus: 18,
+      status: 18,
       name: ColorCollection.name,
       hex: ColorCollection.hex,
       delta: delta,
       message: 'Colors are exact opposite'
-    }
+    };
   } else {
     return {
-      matchstatus: -1,
+      status: -1,
       message: 'Couldn\'t find any similar or matching colors'
-    }
+    };
   }
 
 }
@@ -173,14 +172,14 @@ module.exports = function (hexcolor, options) {
   let matchedColor = [];
   options = options || {};
   colors.collection.forEach(function (element, index) {
-    if (matchColor(cieLabColor, element).matchstatus > 0) {
+    if (matchColor(cieLabColor, element).status > 0) {
       matchedColor.push(matchColor(cieLabColor, element));
     }
   }, this);
 
   const lowestdelta = matchedColor.reduce(function (prev, current) {
-    return (prev.delta < current.delta) ? prev : current
-  }) //returns object
+    return (prev.delta < current.delta) ? prev : current;
+  }); //returns object
 
   console.log(lowestdelta);
 
