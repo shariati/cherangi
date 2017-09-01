@@ -1,7 +1,7 @@
 {
 	"name": "cherangi",
 	"version": "1.0.0",
-	"description": "A small javascript library that finds an exact or similar color name",
+	"description": "A small javascript library that helps you find the name of a color (with over 10000 color names).",
 	"license": "MIT",
 	"keywords": [
 		"color",
@@ -32,8 +32,5 @@
 	},
 	"xo": {
 		"space": true
-	},
-	"dependencies": {
-		"lodash": "^4.17.4"
 	}
 }
