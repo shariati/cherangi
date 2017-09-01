@@ -1,5 +1,4 @@
 'use strict';
-const _ = require('lodash');
 const colors = require('./colors');
 
 function stringToHex(hex) {
@@ -22,11 +21,12 @@ function hexToRGB(hex) {
   hex = hex.replace(shorthandRegex, (m, r, g, b) => `${r}${r}${g}${g}${b}${b}`);
 
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? [
-    parseInt(result[1], 16),
-    parseInt(result[2], 16),
-    parseInt(result[3], 16)
-  ] : [0, 0, 0];
+
+  return result ? {
+    R: parseInt(result[1], 16),
+    G: parseInt(result[2], 16),
+    B: parseInt(result[3], 16)
+  } : {};
 }
 
 /* 
@@ -35,18 +35,22 @@ function hexToRGB(hex) {
   X, Y and Z output refer to a D65/2° standard illuminant.
 */
 
-function rgbToXYZ(red, green, blue) {
-  const RED = ((red / 255) > 0.04045) ? Math.pow((((red / 255) + 0.055) / 1.055) , 2.4) * 100 : ((red / 255) / 12.92) * 100;
-  const GREEN = ((green / 255) > 0.04045) ? Math.pow((((green / 255) + 0.055) / 1.055) , 2.4) * 100 : ((green / 255) / 12.92) * 100;
-  const BLUE = ((blue / 255) > 0.04045) ? Math.pow((((blue / 255) + 0.055) / 1.055) , 2.4) * 100 : ((blue / 255) / 12.92) * 100;
+function rgbToXYZ(RGB) {
+  const RED = ((RGB.R / 255) > 0.04045) ? Math.pow((((RGB.R / 255) + 0.055) / 1.055), 2.4) * 100 : ((RGB.R / 255) / 12.92) * 100;
+  const GREEN = ((RGB.G / 255) > 0.04045) ? Math.pow((((RGB.G / 255) + 0.055) / 1.055), 2.4) * 100 : ((RGB.G / 255) / 12.92) * 100;
+  const BLUE = ((RGB.B / 255) > 0.04045) ? Math.pow((((RGB.B / 255) + 0.055) / 1.055), 2.4) * 100 : ((RGB.B / 255) / 12.92) * 100;
 
-  const X = RED * 0.4124 + GREEN * 0.3576 + BLUE * 0.1805;
-  const Y = RED * 0.2126 + GREEN * 0.7152 + BLUE * 0.0722;
-  const Z = RED * 0.0193 + GREEN * 0.1192 + BLUE * 0.9505;
-  
-  return [ X, Y , Z ];
-  
+  const Xv = RED * 0.4124 + GREEN * 0.3576 + BLUE * 0.1805;
+  const Yv = RED * 0.2126 + GREEN * 0.7152 + BLUE * 0.0722;
+  const Zv = RED * 0.0193 + GREEN * 0.1192 + BLUE * 0.9505;
+
+  return {
+    X: Xv,
+    Y: Yv,
+    Z: Zv
+  };
 }
+
 /* 
   http://www.easyrgb.com/en/math.php
   XYZ (Tristimulus) Reference values of a perfect reflecting diffuser
@@ -54,80 +58,130 @@ function rgbToXYZ(red, green, blue) {
   2° (CIE 1964) REFERENCE_X, REFERENCE_Y and REFERENCE_Z.
   Daylight, sRGB, Adobe-RGB
 */
-function xyzToCIELab (x, y, z) {
+function xyzToCIELab(XYZ) {
 
   const REFERENCE_X = 95.047;
   const REFERENCE_Y = 100.000;
   const REFERENCE_Z = 108.883;
-  
-  const X = ( (x / REFERENCE_X) > 0.008856 ) ? Math.pow((x / REFERENCE_X) , (1/3) ) : (( 7.787 * (x / REFERENCE_X) ) +  (16 / 116) );
-  const Y = ( (y / REFERENCE_Y) > 0.008856 ) ? Math.pow((y / REFERENCE_Y) , (1/3) ) : (( 7.787 * (y / REFERENCE_Y) ) +  (16 / 116) );
-  const Z = ( (z / REFERENCE_Z) > 0.008856 ) ? Math.pow((z / REFERENCE_Z) , (1/3) ) : (( 7.787 * (z / REFERENCE_Z) ) +  (16 / 116) );
 
-  const CIEL = ( 116 * Y ) - 16;
-  const CIEA = 500 * ( X - Y );
-  const CIEB = 200 * ( Y - Z );
-  
-  return [ CIEL, CIEA , CIEB ];
+  const X = ((XYZ.X / REFERENCE_X) > 0.008856) ? Math.pow((XYZ.X / REFERENCE_X), (1 / 3)) : ((7.787 * (XYZ.X / REFERENCE_X)) + (16 / 116));
+  const Y = ((XYZ.Y / REFERENCE_Y) > 0.008856) ? Math.pow((XYZ.Y / REFERENCE_Y), (1 / 3)) : ((7.787 * (XYZ.Y / REFERENCE_Y)) + (16 / 116));
+  const Z = ((XYZ.Z / REFERENCE_Z) > 0.008856) ? Math.pow((XYZ.Z / REFERENCE_Z), (1 / 3)) : ((7.787 * (XYZ.Z / REFERENCE_Z)) + (16 / 116));
+
+  const CIEL = (116 * Y) - 16;
+  const CIEA = 500 * (X - Y);
+  const CIEB = 200 * (Y - Z);
+
+  return {
+    L: CIEL,
+    a: CIEA,
+    b: CIEB
+  };
 }
 
-function rgbToCIELab (red, green, blue) {
-  const XYZ =  rgbToXYZ(red,green,blue);
-  return xyzToCIELab(XYZ[0], XYZ[1], XYZ[2]);
+function rgbToCIELab(RGB) {
+  const XYZ = rgbToXYZ(RGB);
+  return xyzToCIELab(XYZ);
 }
 
 /*
   http://www.easyrgb.com/en/math.php 
   https://en.wikipedia.org/wiki/Color_difference
-  graphic arts weighting factors are used
-  WHTL = 1, WHTC = 0.045, WHTH = 0.015
-  DeltaE94 return value table
+
+  Delta E* CIE return value table
   http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e
+*/
+
+function DeltaE1994(CIELab1, CIELab2) {
+
+  const DeltaE94 = Math.sqrt(Math.pow((CIELab1.L - CIELab2.L), 2) + Math.pow((CIELab1.a - CIELab2.a), 2) + Math.pow((CIELab1.b - CIELab2.b), 2));
+  return DeltaE94;
+}
+
+/*
   Delta E	  Perception
   <= 1.0	  Not perceptible by human eyes.
   1 - 2	    Perceptible through close observation.
   2 - 10	  Perceptible at a glance.
   11 - 49	  Colors are more similar than opposite
   100	      Colors are exact opposite
+  
+  matchstatus
+  0   Exact Match
+  2	  Not perceptible by human eyes.
+  4	  Perceptible through close observation.
+  8	  Perceptible at a glance.
+  16	Colors are exact opposite
 */
 
-function DeltaE1994(CIELab1  , CIELab2) {
-  //Weighting factors
-  const WHTL = 1;
-  const WHTC = 0.045;
-  const WHTH = 0.015;
-  
-  const xC1 = Math.sqrt(Math.pow( CIELab1[1] , 2 ) + Math.pow( CIELab1[2] , 2 ));
-  const xC2 = Math.sqrt(Math.pow( CIELab2[1] , 2 ) + Math.pow( CIELab2[2] , 2 ));
-  let xDL = CIELab2[0] - CIELab1[0];
-  let xDC = xC2 - xC1;
-  const xDE = Math.sqrt( ( ( CIELab1[0] - CIELab2[0] ) * ( CIELab1[0] - CIELab2[0] ) ) + ( ( CIELab1[1] - CIELab2[1] ) * ( CIELab1[1] - CIELab2[1]) ) + ( ( CIELab1[2] - CIELab2[2] ) * ( CIELab1[2] - CIELab2[2] ) ) );
-  
-  let xDH = ( xDE * xDE ) - ( xDL * xDL ) - ( xDC * xDC );
-  xDH = ( xDH > 0 ) ? Math.sqrt( xDH ) : 0;
+function matchColor(CIELab1, ColorCollection) {
+  let delta = DeltaE1994(CIELab1, ColorCollection.cieLab);
 
-  const xSC = 1 + ( 0.045 * xC1 );
-  const xSH = 1 + ( 0.015 * xC1 );
-  xDL = xDL / WHTL;
-  xDC = xDC / (WHTC * xSC);
-  xDH = xDH / (WHTH * xSH);
-  
-  const DeltaE94 = Math.sqrt( Math.pow(xDL , 2) + Math.pow(xDC , 2) + Math.pow(xDH , 2) );
-  return DeltaE94;
+  if (delta === 0) {
+    return {
+      matchstatus: 1,
+      name: ColorCollection.name,
+      hex: ColorCollection.hex,
+      delta: delta,
+      message: 'Exact Match'
+    }
+  } else if (delta > 0 && delta <= 1) {
+    return {
+      matchstatus: 2,
+      name: ColorCollection.name,
+      hex: ColorCollection.hex,
+      delta: delta,
+      message: 'Not perceptible by human eyes'
+    }
+  } else if (delta > 1 && delta < 2) {
+    return {
+      matchstatus: 4,
+      name: ColorCollection.name,
+      hex: ColorCollection.hex,
+      delta: delta,
+      message: 'Perceptible through close observation'
+    }
+  } else if (delta >= 2 && delta < 10) {
+    return {
+      matchstatus: 8,
+      name: ColorCollection.name,
+      hex: ColorCollection.hex,
+      delta: delta,
+      message: 'Perceptible at a glance'
+    }
+  } else if (delta === 100) {
+    return {
+      matchstatus: 18,
+      name: ColorCollection.name,
+      hex: ColorCollection.hex,
+      delta: delta,
+      message: 'Colors are exact opposite'
+    }
+  } else {
+    return {
+      matchstatus: -1,
+      message: 'Couldn\'t find any similar or matching colors'
+    }
+  }
+
 }
 
 module.exports = function (hexcolor, options) {
   hexcolor = stringToHex(hexcolor);
   let rgbColor = hexToRGB(hexcolor);
-  console.log(`RGB: ${rgbColor}`);
-  let cieLabColor = rgbToCIELab(rgbColor[0], rgbColor[1], rgbColor[2]);
+  let cieLabColor = rgbToCIELab(rgbColor);
+  let matchedColor = [];
   options = options || {};
-  colors.collection.forEach(function(element) {
-  let delta = DeltaE1994(cieLabColor , [element.CIELab.L,element.CIELab.a, element.CIELab.b]);
-  console.log(delta);
-  if(delta <= 1) {
-    console.log(`DELTA is: (${delta}) - ${hexcolor} and ${element.Name} with hexcode of ${element.RGB.Red},${element.RGB.Green}, ${element.RGB.Blue} Perceptible through close observation`);
-  }
-}, this);
+  colors.collection.forEach(function (element, index) {
+    if (matchColor(cieLabColor, element).matchstatus > 0) {
+      matchedColor.push(matchColor(cieLabColor, element));
+    }
+  }, this);
+
+  const lowestdelta = matchedColor.reduce(function (prev, current) {
+    return (prev.delta < current.delta) ? prev : current
+  }) //returns object
+
+  console.log(lowestdelta);
 
 };
