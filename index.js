@@ -29,16 +29,16 @@ function hexToRGB(hex) {
   ] : [0, 0, 0];
 }
 
-/* http://www.easyrgb.com/en/math.php
-(Standard RGB) input range = 0 ÷ 255
-X, Y and Z output refer to a D65/2° standard illuminant.
+/* 
+  http://www.easyrgb.com/en/math.php
+  (Standard RGB) input range = 0 ÷ 255
+  X, Y and Z output refer to a D65/2° standard illuminant.
 */
 
 function rgbToXYZ(red, green, blue) {
-
-  const RED = ((red / 255) > 0.04045) ? ((((red / 255) + 0.055) / 1.055) ^ 2.4) * 100 : ((red / 255) / 12.92) * 100;
-  const GREEN = ((green / 255) > 0.04045) ? ((((green / 255) + 0.055) / 1.055) ^ 2.4) * 100 : ((green / 255) / 12.92) * 100;
-  const BLUE = ((blue / 255) > 0.04045) ? ((((blue / 255) + 0.055) / 1.055) ^ 2.4) * 100 : ((blue / 255) / 12.92) * 100;
+  const RED = ((red / 255) > 0.04045) ? Math.pow((((red / 255) + 0.055) / 1.055) , 2.4) * 100 : ((red / 255) / 12.92) * 100;
+  const GREEN = ((green / 255) > 0.04045) ? Math.pow((((green / 255) + 0.055) / 1.055) , 2.4) * 100 : ((green / 255) / 12.92) * 100;
+  const BLUE = ((blue / 255) > 0.04045) ? Math.pow((((blue / 255) + 0.055) / 1.055) , 2.4) * 100 : ((blue / 255) / 12.92) * 100;
 
   const X = RED * 0.4124 + GREEN * 0.3576 + BLUE * 0.1805;
   const Y = RED * 0.2126 + GREEN * 0.7152 + BLUE * 0.0722;
@@ -46,6 +46,29 @@ function rgbToXYZ(red, green, blue) {
   
   return [ X, Y , Z ];
   
+}
+/* 
+  http://www.easyrgb.com/en/math.php
+  XYZ (Tristimulus) Reference values of a perfect reflecting diffuser
+  D65 is illuminants and observer has been choosen
+  2° (CIE 1964) REFERENCE_X, REFERENCE_Y and REFERENCE_Z.
+  Daylight, sRGB, Adobe-RGB
+*/
+function xyzToCIELab (x, y, z) {
+
+  const REFERENCE_X = 95.047;
+  const REFERENCE_Y = 100.000;
+  const REFERENCE_Z = 108.883;
+  
+  const X = ( (x / REFERENCE_X) > 0.008856 ) ? Math.pow((x / REFERENCE_X) , (1/3) ) : (( 7.787 * (x / REFERENCE_X) ) +  (16 / 116) );
+  const Y = ( (y / REFERENCE_Y) > 0.008856 ) ? Math.pow((y / REFERENCE_Y) , (1/3) ) : (( 7.787 * (y / REFERENCE_Y) ) +  (16 / 116) );
+  const Z = ( (z / REFERENCE_Z) > 0.008856 ) ? Math.pow((z / REFERENCE_Z) , (1/3) ) : (( 7.787 * (z / REFERENCE_Z) ) +  (16 / 116) );
+
+  const CIEL = ( 116 * Y ) - 16;
+  const CIEA = 500 * ( X - Y );
+  const CIEB = 200 * ( Y - Z );
+  
+  return [ CIEL, CIEA , CIEB ];
 }
 
 // https://en.wikipedia.org/wiki/HSL_and_HSV  
@@ -82,12 +105,51 @@ function rgbToHSL(red, green, blue) {
   return [Math.round(hue), Math.round(saturation * 100), Math.round(LIGHTNESS * 100)];
 }
 
+/*
+  http://www.easyrgb.com/en/math.php 
+  https://en.wikipedia.org/wiki/Color_difference
+  graphic arts weighting factors are used
+  WHTL = 1, WHTC = 0.045, WHTH = 0.015
+  DeltaE94 return value table
+  http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e
+  Delta E	  Perception
+  <= 1.0	  Not perceptible by human eyes.
+  1 - 2	    Perceptible through close observation.
+  2 - 10	  Perceptible at a glance.
+  11 - 49	  Colors are more similar than opposite
+  100	      Colors are exact opposite
+*/
+
+function DeltaE1994(CIELab1  , CIELab2) {
+  //Weighting factors
+  const WHTL = 1;
+  const WHTC = 0.045;
+  const WHTH = 0.015;
+  
+  const xC1 = Math.sqrt(( CIELab1[1] ^ 2 ) + ( CIELab1[2] ^ 2 ));
+  const xC2 = Math.sqrt(( CIELab2[1] ^ 2 ) + ( CIELab2[2] ^ 2 ));
+  let xDL = CIELab2[0] - CIELab1[0];
+  let xDC = xC2 - xC1
+  const xDE = Math.sqrt( ( ( CIELab1[0] - CIELab2[0] ) * ( CIELab1[0] - CIELab2[0] ) ) + ( ( CIELab1[1] - CIELab2[1] ) * ( CIELab1[1] - CIELab2[1]) ) + ( ( CIELab1[2] - CIELab2[2] ) * ( CIELab1[2] - CIELab2[2] ) ) );
+  
+  let xDH = ( xDE * xDE ) - ( xDL * xDL ) - ( xDC * xDC )
+  xDH = ( xDH > 0 ) ? Math.sqrt( xDH ) : 0;
+
+  const xSC = 1 + ( 0.045 * xC1 );
+  const xSH = 1 + ( 0.015 * xC1 );
+  xDL = xDL / WHTL;
+  xDC = xDC / (WHTC * xSC);
+  xDH = xDH / (WHTH * xSH);
+  
+  const DeltaE94 = Math.sqrt( xDL ^ 2 + xDC ^ 2 + xDH ^ 2 );
+  return DeltaE94;
+}
+
 module.exports = function (hexcolor, options) {
   hexcolor = stringToHex(hexcolor);
   let rgbColor = hexToRGB(hexcolor);
   let hslColor = rgbToHSL(rgbColor[0], rgbColor[1], rgbColor[2]);
   options = options || {};
-  console.log(colors.collection[0]);
 
   return {
     rgb: rgbColor,
