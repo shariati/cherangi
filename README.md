@@ -37,7 +37,7 @@ $ cherangi --help
   Example
     cherangi('fff')
     cherangi('#fcfcfc')
-
+```
 
 ## Thanks to
 * David Aerne for the awesome list of color names (https://github.com/meodai/color-names) 
