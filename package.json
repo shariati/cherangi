@@ -1,0 +1,39 @@
+{
+	"name": "cherangi",
+	"version": "1.0.0",
+	"description": "A small javascript library that finds an exact or similar color name",
+	"license": "MIT",
+	"keywords": [
+		"color",
+		"rgb",
+		"hex",
+		"input",
+		"cli",
+		"cli-app",
+		"colorname"
+	],
+	"homepage": "https://github.com/shariati/cherangi",
+	"author": "Amin Shariati",
+	"repository": "shariati/cherangi",
+	"bin": "cli.js",
+	"files": [
+		"index.js",
+		"cli.js"
+	],
+	"engines": {
+		"node": ">=0.10.0"
+	},
+	"scripts": {
+		"test": "xo && mocha"
+	},
+	"devDependencies": {
+		"mocha": "^3.4.0",
+		"xo": "^0.18.0"
+	},
+	"xo": {
+		"space": true
+	},
+	"dependencies": {
+		"lodash": "^4.17.4"
+	}
+}
