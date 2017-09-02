@@ -145,15 +145,7 @@ function matchColor(CIELab1, ColorCollection) {
       delta,
       message: 'Perceptible at a glance'
     };
-  } else if (delta === 100) {
-    return {
-      status: 18,
-      name: ColorCollection.name,
-      hex: ColorCollection.hex,
-      delta,
-      message: 'Colors are exact opposite'
-    };
-  }
+  } 
   return {
     status: -1,
     delta,
