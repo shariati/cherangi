@@ -1,15 +1,16 @@
 # Cherangi 
 A small javascript library that helps you find the name of a color (Over 10000 color names).
 
-
 ![](screenshot.png)
+
+## Meaning
+Cherangi (Che Rangi?) is a Farsi (Persian) sentence which means "What color?"
 
 ## Install
 
 ```
 $ npm install --save cherangi
 ```
-
 
 ## Usage
 
