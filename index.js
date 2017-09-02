@@ -145,7 +145,7 @@ function matchColor(CIELab1, ColorCollection) {
       delta,
       message: 'Perceptible at a glance'
     };
-  } 
+  }
   return {
     status: -1,
     delta,
