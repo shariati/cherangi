@@ -13,7 +13,7 @@ require('taketalk')({
       '  ' + pkg.description,
       '',
       '  Usage',
-      '    cherangi(<string>)',
+      '    cherangi <string>',
       '    echo <string> | cherangi',
       '',
       '  Example',

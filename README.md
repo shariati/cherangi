@@ -31,12 +31,12 @@ $ npm install --global cherangi
 $ cherangi --help
 
   Usage
-    cherangi('hexcode')
-    cherangi('#hexcode')
+    cherangi 'hexcode'
+    cherangi '#hexcode'
 
   Example
-    cherangi('fff')
-    cherangi('#fcfcfc')
+    cherangi 'fff'
+    cherangi '#fcfcfc'
 ```
 
 ## Thanks to
