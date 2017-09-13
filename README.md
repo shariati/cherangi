@@ -95,6 +95,12 @@ $ cherangi --help
 ```
 
 ## Thanks to
-* [David Aerne](https://github.com/meodai/color-names)  for the awesome list of color names.
+* [David Aerne](https://github.com/meodai/color-names) for the awesome list of color names.
 * [EasyRGB.com](http://www.easyrgb.com/en/math.php) for providing the formulas
 * [Zachary Schuessler](https://github.com/zschuessler) for the helpful blog about [Delta](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e) 
+
+
+#### Disclaimer
+
+Please note *cherangi* uses [color-names](https://github.com/meodai/color-names/) for the list of colors and in the process of creating this list the author tries to remove all names that are offensive or racist, as well as protect brandnames.
+As some of the color names come from other lists, it might happen that some bad ones slip in. [Please report them](https://github.com/meodai/color-names/issues), they will be removed as quickly as possible.

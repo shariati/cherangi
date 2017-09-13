@@ -1,4 +1,4 @@
-const colors = require('./colors');
+const colors = require('color-name-list');
 
 function stringToHex(hex) {
   // Convert to string and make sure input color is in Uppercase
@@ -158,8 +158,11 @@ module.exports = function (hexcolor) {
   const rgbColor = hexToRGB(hexcolor);
   const cieLabColor = rgbToCIELab(rgbColor);
   const matchedColor = [];
-
-  colors.collection.forEach(element => {
+  colors.forEach(element => {
+    const hexValue = stringToHex(element.hex);
+    const rgbValue = hexToRGB(hexValue);
+    const cieLabValue = rgbToCIELab(rgbValue);
+    element.cieLab = cieLabValue;
     if (matchColor(cieLabColor, element).status > 0) {
       matchedColor.push(matchColor(cieLabColor, element));
     }
