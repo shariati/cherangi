@@ -17,8 +17,7 @@ Cherangi (Che Rangi?) is a Farsi (Persian) sentence which means "What color?"
 
 $ npm install cherangi --save
 
-+ cherangi@1.0.7
-added 3 packages in 6.917s
++ cherangi@VERSION
 ```
 
 ## Usage
@@ -100,8 +99,7 @@ For now all invalid inputs are handled as black color. This will be changed with
 
 $ npm install --global cherangi
 
-+ cherangi@1.0.7
-added 5 packages in 1.116s
++ cherangi@VERSION
 ```
 
 ```bash
