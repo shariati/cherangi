@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-'use strict';
-const pkg = require('./package.json');
-const cherangi = require('./');
+'use strict'
+const pkg = require('./package.json')
+const cherangi = require('./')
 
 require('taketalk')({
-  init(input, options) {
-    console.log(cherangi(input, options));
+  init (input, options) {
+    console.log(cherangi(input, options))
   },
-  help() {
+  help () {
     console.log([
       '',
       '  ' + pkg.description,
@@ -19,7 +19,7 @@ require('taketalk')({
       '  Example',
       '    cherangi "7CB9E8"',
       cherangi('7CB9E8')
-    ].join('\n'));
+    ].join('\n'))
   },
   version: pkg.version
-});
+})
