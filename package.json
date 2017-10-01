@@ -1,7 +1,7 @@
 {
 	"name": "cherangi",
-	"version": "1.0.7",
-	"description": "A small javascript library that helps you find the name of a color (with over 14k color names).",
+	"version": "1.0.8",
+	"description": "A small javascript library that helps you find the name of a color (Over 16K 🎨 color names).",
 	"license": "MIT",
 	"keywords": [
 		"color",
@@ -27,15 +27,24 @@
 		"test": "xo && mocha"
 	},
 	"devDependencies": {
+		"eslint": "^4.8.0",
+		"eslint-config-standard": "^10.2.1",
+		"eslint-plugin-node": "^5.2.0",
+		"eslint-plugin-standard": "^3.0.1",
 		"jshint": "^2.9.5",
 		"mocha": "^3.4.0",
 		"xo": "^0.18.0"
 	},
 	"xo": {
-		"space": true
+		"space": true,
+		"semicolon": false,
+		"rules": {
+			"space-before-function-paren": 0
+		}
 	},
 	"dependencies": {
+		"color-name-list": "3.8.1",
 		"taketalk": "^1.0.0",
-		"color-name-list": "^3.8.0"
+		"yo": "^2.0.0"
 	}
 }
