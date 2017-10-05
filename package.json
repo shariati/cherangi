@@ -42,6 +42,7 @@
 		}
 	},
 	"dependencies": {
-		"color-name-list": "3.8.1"
+		"color-name-list": "3.8.1",
+		"taketalk": "^1.0.0"
 	}
 }
