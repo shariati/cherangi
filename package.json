@@ -1,6 +1,6 @@
 {
 	"name": "cherangi",
-	"version": "1.0.9",
+	"version": "1.1.0",
 	"description": "A small javascript library that helps you find the name of a color (Over 16K 🎨 color names).",
 	"license": "MIT",
 	"keywords": [
