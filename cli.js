@@ -8,18 +8,20 @@ require('taketalk')({
     console.log(cherangi(input, options))
   },
   help () {
-    console.log([
-      '',
-      '  ' + pkg.description,
-      '',
-      '  Usage',
-      '    cherangi <string>',
-      '    echo <string> | cherangi',
-      '',
-      '  Example',
-      '    cherangi "7CB9E8"',
-      cherangi('7CB9E8')
-    ].join('\n'))
+    console.log(
+      [
+        '',
+        '  ' + pkg.description,
+        '',
+        '  Usage',
+        '    cherangi <string>',
+        '    echo <string> | cherangi',
+        '',
+        '  Example',
+        '    cherangi "7CB9E8"',
+        cherangi('7CB9E8')
+      ].join('\n')
+    )
   },
   version: pkg.version
 })

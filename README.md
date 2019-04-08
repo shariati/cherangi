@@ -3,9 +3,9 @@
 [![npm version](https://badge.fury.io/js/cherangi.svg)](https://badge.fury.io/js/cherangi)
 [![Known Vulnerabilities](https://snyk.io/test/github/shariati/cherangi/badge.svg)](https://snyk.io/test/github/shariati/cherangi)
 
-A small javascript library that helps you find the name of a color (Over 16K 🎨 color names).
+A small javascript library that helps you find the name of a color (Over 18K 🎨 color names).
 
-![](screenshot.png)
+![cherangi](screenshot.png)
 
 ## Meaning
 
@@ -23,10 +23,9 @@ $ npm install cherangi --save
 ## Usage
 
 ```javascript
-const cherangi = require('cherangi');
+const cherangi = require("cherangi");
 
-cherangi('#cfcfcf');
-
+cherangi("#cfcfcf");
 ```
 
 ### About Returned Object
@@ -38,13 +37,13 @@ if consists of a `status` , `name`, `hex`, `delta` and a `message`
 
 Holds the status information of the results which could be one of the following
 
-| Status Code |   Status Description                      |
-|-------------|-------------------------------------------|
-| 0           |   Exact Match                             |
-| 2           |   Not perceptible by human eyes.          |
-| 4           |   Perceptible through close observation.  |
-| 8           |   Perceptible at a glance.                |
-| -1          |   No Color match found                    |
+| Status Code | Status Description                     |
+| ----------- | -------------------------------------- |
+| 0           | Exact Match                            |
+| 2           | Not perceptible by human eyes.         |
+| 4           | Perceptible through close observation. |
+| 8           | Perceptible at a glance.               |
+| -1          | No Color match found                   |
 
 #### Name
 
@@ -122,5 +121,5 @@ $ cherangi --help
 
 ## Disclaimer
 
-Please note *cherangi* uses [color-names](https://github.com/meodai/color-names/) for the list of colors and in the process of creating this list the author tries to remove all names that are offensive or racist, as well as protect brandnames.
+Please note _cherangi_ uses [color-names](https://github.com/meodai/color-names/) for the list of colors and in the process of creating this list the author tries to remove all names that are offensive or racist, as well as protect brandnames.
 As some of the color names come from other lists, it might happen that some bad ones slip in. [Please report them](https://github.com/meodai/color-names/issues), they will be removed as quickly as possible.
