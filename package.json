@@ -37,7 +37,7 @@
     "standard": "^16.0.4"
   },
   "dependencies": {
-    "color-name-list": "4.2.0",
+    "color-name-list": "8.31.0",
     "taketalk": "^1.0.0"
   }
 }
