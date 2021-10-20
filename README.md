@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/cherangi.svg)](https://badge.fury.io/js/cherangi)
 [![Known Vulnerabilities](https://snyk.io/test/github/shariati/cherangi/badge.svg)](https://snyk.io/test/github/shariati/cherangi)
 
-A small javascript library that helps you find the name of a color (Over 18K 🎨 color names).
+A small javascript library that helps you find the name of a color (Over 29K 🎨 color names, Thanks to color-name-list package )..
 
 ![cherangi](screenshot.png)
 
